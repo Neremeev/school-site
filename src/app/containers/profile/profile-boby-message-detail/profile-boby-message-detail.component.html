@@ -1,0 +1,12 @@
+<div *ngIf="message && user">
+  <div class="message" *ngFor="let m of message.messages; let i = index">
+    <p>сообщение <span id="{{i}}" [innerHTML]="m.message"></span></p>
+    <p [routerLink]="['/profile/otherProfile', m.author.id]">автор {{m.author.name}}</p>
+    <p>дата {{m.date}}</p>
+    <button *ngIf="m.author.id === user.id" (click)="openEditMessage(m, i)">открыть редактор</button>
+    <textarea *ngIf="m.author.id === user.id && openEdit[i]" type="text" class="form-control" [placeholder]="'Введите сообщение'" [(ngModel)]="editMessageValue"></textarea>
+    <button *ngIf="m.author.id === user.id && openEdit[i]" (click)="editMessage(m)">Редактировать</button>
+  </div>
+  <input type="text" class="form-control" [placeholder]="'Введите сообщение'" [(ngModel)]="newMessage">
+  <button (click)="addMessage()">Отправить</button>
+</div>

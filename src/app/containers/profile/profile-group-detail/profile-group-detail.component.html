@@ -1,0 +1,50 @@
+<div *ngIf="sendRequest === 'false' && !groupInMyList">
+  не можете добавить
+</div>
+<div *ngIf="sendRequest === 'true' && !groupInMyList">
+  <button (click)="onRequest()">Подать заявку в группу</button>
+</div>
+<div *ngIf="groupInMyList && group">
+  <p> {{group.name}} </p>
+  <p> {{group.description}} </p>
+  <div>
+    <span *ngFor="let m of group.members">{{m.name}}</span>
+  </div>
+  <hr>
+  <div>
+    <p>Стена</p>
+    <p>Закрепленная запись {{group.pinNote}}</p>
+    <div *ngIf="user.role === 'teacher'">
+      <input [(ngModel)]="group.pinNote">
+      <button (click)="updatePinMessage()">Редактировать</button>
+    </div>
+    <hr>
+    <div *ngFor="let m of group.notes | slice:0:countMessages">
+      <p>{{m.description}} {{m.date}} <a [routerLink]="['/profile/otherProfile', m.author.id]">{{m.author.name}}</a></p>
+      <div *ngFor="let c of m.tread">
+        <p>{{c.description}} {{c.date}} <a [routerLink]="['/profile/otherProfile', c.author.id]">{{c.author.name}}</a></p>
+        <p *ngIf="user.id === c.author.id">
+          <input [(ngModel)]="c.description">
+          <button (click)="updateMessageComments(c, m)">Редактировать коммент</button>
+        </p>
+      </div>
+      <p>Сделать запись</p>
+      <p>
+        <input [(ngModel)]="newComment">
+        <button (click)="newMessageComment(m)">Новый комментарий</button>
+      </p>
+      <div *ngIf="user.id === m.author.id">
+        <input [(ngModel)]="m.description">
+        <button (click)="updateMessage(m)">Редактировать</button>
+      </div>
+      <hr>
+    </div>
+    <div>
+      <p>Сделать запись</p>
+      <p>
+        <input [(ngModel)]="newNote">
+        <button (click)="newMessage()">Новая запись</button>
+      </p>
+    </div>
+  </div>
+</div>

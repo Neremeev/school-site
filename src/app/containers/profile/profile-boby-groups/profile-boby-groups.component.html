@@ -1,0 +1,16 @@
+<button (click)="changeGroups(true)">Мои группы</button>
+<button (click)="changeGroups(false)">Все группы</button>
+
+<input type="text" class="form-control" [placeholder]="'Текст для поиска'" [(ngModel)]="searchValue">
+
+<div *ngIf="viewGroups">
+  <div *ngFor="let group of myGroups | search: searchValue;">
+    <a [routerLink]="['/profile/group', group.id]" [queryParams]="{'request': group.request}"> {{group.name}} </a>
+  </div>
+</div>
+
+<div *ngIf="!viewGroups">
+  <div *ngFor="let group of groupsList | search: searchValue;">
+    <a [routerLink]="['/profile/group', group.id]" [queryParams]="{'request': group.request}"> {{group.name}} </a>
+  </div>
+</div>

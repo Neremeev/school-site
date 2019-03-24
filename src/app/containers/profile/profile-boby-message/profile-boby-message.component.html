@@ -1,0 +1,8 @@
+<div *ngIf="user">
+  <div class="message" *ngFor="let m of user.messages" [routerLink]="['/profile/message', m.id]">
+    <p>автор {{m.message.author.name}}</p>
+    <p>дата {{m.message.date}}</p>
+    <p>сообщение <span [innerHTML]="m.message.message"></span></p>
+    <p>прочитано {{m.unread}}</p>
+  </div>
+</div>

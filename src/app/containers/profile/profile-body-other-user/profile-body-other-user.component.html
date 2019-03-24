@@ -1,0 +1,18 @@
+<div *ngIf="user && user.firstName">
+  <p>Имя: {{user.firstName}}</p>
+  <p>Фамилия: {{user.lastName}}</p>
+  <p>Дата рождения: {{user.birthDay}}</p>
+  <p>Класс: {{user.teachGroup}}</p>
+  <p>Заходил: {{user.last_seen}}</p>
+  <p>Классная руководительница: {{user.teacher}}</p>
+  <p>Фото: <img src="{{user.photo}}"></p>
+  <div *ngIf="button">
+    <button (click)="deleteFriends()">Удалить из друзей</button>
+  </div>
+  <div *ngIf="!button && !application">
+    <button (click)="addFriends()">Добавить в друзья</button>
+  </div>
+  <div *ngIf="!button && application">
+    <p>Заявка отправлена</p>
+  </div>
+</div>

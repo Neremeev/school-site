@@ -1,0 +1,39 @@
+<button (click)="changeFriends(true)">Мои друзья</button>
+<button (click)="changeFriends(false)">Все участники</button>
+<button (click)="changeFriends(null)">Заявки</button>
+
+<input  *ngIf="viewFriends !== null" type="text" class="form-control" [placeholder]="'Текст для поиска'" [(ngModel)]="searchValue">
+
+<div *ngIf="viewFriends === true">
+  <div *ngFor="let friend of myFriends | search: searchValue;">
+    <a [routerLink]="['/profile/otherProfile', friend.id]"> {{friend.name}} </a>
+  </div>
+</div>
+
+<div *ngIf="viewFriends === false">
+  <div>
+    <p>Учителя</p>
+    <div *ngFor="let friend of allUserList.teachers | search: searchValue;">
+      <a [routerLink]="['/profile/otherProfile', friend.id]"> {{friend.name}} </a>
+    </div>
+  </div>
+
+  <div>
+    <p>Ученики</p>
+    <div *ngFor="let friend of allUserList.students | search: searchValue;">
+      <a [routerLink]="['/profile/otherProfile', friend.id]"> {{friend.name}} </a>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="viewFriends === null">
+  <p>Заявки</p>
+  <div *ngIf="user.applications && user.applications.length > 0">
+    <div *ngFor="let application of user.applications">
+      <a [routerLink]="['/profile/otherProfile', application.id]"> {{application.name}} </a>
+      <button (click)="addFriend(application)">Добавить</button>
+      <button (click)="deleteFriend(application)">Не добавлять</button>
+    </div>
+  </div>
+</div>
