@@ -1,25 +1,45 @@
-import {Component, OnInit} from '@angular/core';
-import {FileSystemDirectoryEntry, FileSystemFileEntry, UploadEvent, UploadFile} from "ngx-file-drop";
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {FileSystemFileEntry, UploadEvent, UploadFile} from "ngx-file-drop";
 import {UserService} from "../../../../shared/services/user.service";
 import {User} from "../../../../shared/models/user.model";
 import {AppState} from "../../../../store/app.state";
 import {Store} from "@ngrx/store";
 import {Subscription} from "rxjs/index";
-import Cropper from 'cropperjs';
+import {ImageCropperComponent, CropperSettings} from 'ng2-img-cropper';
+import {LoadProfile} from "../../../../store/actions/user.action";
 
 @Component({
   selector: 'app-change-picture',
   templateUrl: './change-picture.component.html',
   styleUrls: ['./change-picture.component.scss']
 })
-export class ChangePictureComponent implements OnInit {
+export class ChangePictureComponent implements OnInit, OnDestroy {
+
+
+
+  @ViewChild('cropper', undefined)
+  cropper: ImageCropperComponent;
+
+  cropperSettings = new CropperSettings();
+  data = {};
 
   public files: UploadFile[] = [];
   storeSub: Subscription;
+  userServiceSub: Subscription;
   user: User;
-  output;
+  picture;
 
-  constructor(private userService: UserService, private store: Store<AppState>) {}
+  constructor(private userService: UserService, private store: Store<AppState>) {
+
+    this.cropperSettings.width = 150;
+    this.cropperSettings.height = 200;
+    this.cropperSettings.noFileInput = true;
+    this.cropperSettings.croppedWidth = 150;
+    this.cropperSettings.croppedHeight = 200;
+    this.cropperSettings.canvasWidth = 400;
+    this.cropperSettings.canvasHeight = 400;
+
+  }
 
   ngOnInit() {
     this.storeSub = this.store.select('userPage').subscribe(({user}) => {
@@ -30,82 +50,53 @@ export class ChangePictureComponent implements OnInit {
 
   dropped(event: UploadEvent) {
     this.files = event.files;
+    const that = this;
     for (const droppedFile of event.files) {
-
-      // Is it a file?
       if (droppedFile.fileEntry.isFile) {
         const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
         fileEntry.file((file: File) => {
 
-          // Here you can access the real file
-          console.log(droppedFile.relativePath, file);
-
-          /**
-           // You could upload it like this:
-           const formData = new FormData()
-           formData.append('logo', file, relativePath)
-
-           // Headers
-           const headers = new HttpHeaders({
-            'security-token': 'mytoken'
-          })
-
-           this.http.post('https://mybackend.com/api/upload/sanitize-and-save-logo', formData, { headers: headers, responseType: 'blob' })
-           .subscribe(data => {
-            // Sanitized logo returned from backend
-          })
-           **/
+          const reader: any = new FileReader();
+          reader.onload = function(e: any) {
+            this.picture = e.currentTarget.result;
+            const image = new Image();
+            image.src = reader.result;
+            that.cropper.setImage(image);
+          };
+          reader.readAsDataURL(file);
 
         });
-      } else {
-        // It was a directory (empty directories are added, otherwise only files)
-        const fileEntry = droppedFile.fileEntry as FileSystemDirectoryEntry;
-        console.log(droppedFile.relativePath, fileEntry);
       }
     }
   }
 
-  fileOver(event) {
-    console.log(event);
-  }
-
-  fileLeave(event) {
-    console.log(event);
-  }
-
   handleFiles(event) {
-    let picture;
-    const reader = new FileReader();
+    const reader: any = new FileReader();
+    const that = this;
     reader.onload = function(e: any) {
-      picture = e.currentTarget.result;
-      this.output = document.getElementById('output_image');
-      this.output.src = reader.result;
-      const cropper = new Cropper(this.output, {
-        aspectRatio: 2 / 3,
-        crop: function(e) {
-          console.log(e.detail);
-        },
-        ready: function() {
-          console.log('123123');
-          let data = cropper.getCropBoxData();
-
-          setTimeout(function() {
-            data.left = 100;
-            data.top = 200;
-            cropper.setCropBoxData(data);
-          }, 1000);
-        }
-      });
+      this.picture = e.currentTarget.result;
+      const image = new Image();
+      image.src = reader.result;
+      that.cropper.setImage(image);
     };
     reader.readAsDataURL(event.target.files[0]);
-    this.userService.getUser(this.user.login)
-      .subscribe((user: User) => {
-          user[0]['photo'] = picture;
-          this.userService.updateUser(user[0])
-            .subscribe(data => {
-            });
+  }
+
+  sendFile() {
+    const cropPhoto = document.getElementById('crop').getAttribute('src');
+    this.user.photo = cropPhoto;
+    this.userServiceSub = this.userService.updateUser(this.user)
+      .subscribe(data => {
+        this.store.dispatch(new LoadProfile (data));
     });
   }
 
-
+  ngOnDestroy() {
+    if (this.storeSub) {
+      this.storeSub.unsubscribe();
+    }
+    if (this.userServiceSub) {
+      this.userServiceSub.unsubscribe();
+    }
+  }
 }

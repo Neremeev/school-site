@@ -19,4 +19,9 @@
   </div>
 </div>
 
-<img id="output_image"/>
+<img-cropper #cropper [image]="data" [settings]="cropperSettings"></img-cropper>
+<br>
+<span class="result rounded" *ngIf="data.image" >
+    <img id="crop" [src]="data.image" [width]="cropperSettings.croppedWidth" [height]="cropperSettings.croppedHeight">
+</span>
+<button (click)="sendFile()">Отправить</button>

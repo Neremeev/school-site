@@ -7,6 +7,7 @@ import {Store} from "@ngrx/store";
 import {Router} from "@angular/router";
 import {LoadProfile} from "../../store/actions/user.action";
 import {Subscription} from "rxjs/index";
+import {getUserService} from "../../shared/services/getUsersInfo.service";
 
 @Component({
   selector: 'app-auth',
@@ -17,10 +18,11 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   form: FormGroup;
   message;
-  storeSub: Subscription;
+  userServiceSub: Subscription;
 
   constructor(
     private userService: UserService,
+    private getUserService: getUserService,
     private store: Store<AppState>,
     private router: Router
   ) {}
@@ -34,11 +36,13 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     const formData = this.form.value;
-    this.storeSub = this.userService.getUser(formData.login)
+    this.userServiceSub = this.userService.getUser(formData.login)
       .subscribe((user: User) => {
         if (user[0]) {
           if (user[0].password === formData.password) {
             this.store.dispatch(new LoadProfile (user[0]));
+            sessionStorage.setItem('id', user[0]['id']);
+            this.getUserService.getUserInfo(user[0]);
             this.router.navigate(['/profile', 'account']);
           } else {
             this.showMessage('Пароль не верный');
@@ -50,8 +54,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.storeSub) {
-      this.storeSub.unsubscribe();
+    if (this.userServiceSub) {
+      this.userServiceSub.unsubscribe();
     }
   }
 

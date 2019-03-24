@@ -1,4 +1,15 @@
-<p>
+<p *ngIf="user">
   <button><a [routerLink]="['/profile', 'settings']">Настройки</a></button>
   <button><a [routerLink]="['/profile', 'account']">Профиль</a></button>
+  <button><a [routerLink]="['/profile', 'groups']">Группы</a></button>
+  <button>
+    <a [routerLink]="['/profile', 'friends']">Друзья
+      <span *ngIf="user.applications && user.applications.length > 0">new</span>
+    </a>
+  </button>
+  <button>
+    <a [routerLink]="['/profile', 'message']">Сообщения
+      <span *ngIf="newMessages">new ({{unreadMessageCount}})</span>
+    </a>
+  </button>
 </p>

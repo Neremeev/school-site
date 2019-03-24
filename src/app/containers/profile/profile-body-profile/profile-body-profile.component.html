@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="user && user.firstName">
   <p>Имя: {{user.firstName}}</p>
   <p>Фамилия: {{user.lastName}}</p>
   <p>Дата рождения: {{user.birthDay}}</p>

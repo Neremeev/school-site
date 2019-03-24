@@ -18,10 +18,11 @@ export class BaseApi {
     return this.http.get(this.getUrl(url));
   }
 
-  // public post(url: string = '', data: any = {}): Observable<any> {
-  //   return this.http.post(this.getUrl(url), data)
-  // }
-  //
+  public post(url: string = '', data: any = {}): Observable<any> {
+    console.log(data);
+    console.log(this.getUrl(url));
+    return this.http.post(this.getUrl(url), data);
+  }
 
   public put(url: string = '', data: any = {}): Observable<any> {
     return this.http.put(this.getUrl(url), data);

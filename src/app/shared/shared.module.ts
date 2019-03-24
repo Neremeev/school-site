@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {HeaderComponent} from './components/header/header.component';
 import {RouterModule} from '@angular/router';
 import {UserService} from "./services/user.service";
+import {getUserService} from "./services/getUsersInfo.service";
 
 @NgModule({
   declarations: [
@@ -15,6 +16,6 @@ import {UserService} from "./services/user.service";
   exports: [
     HeaderComponent
   ],
-  providers: [UserService]
+  providers: [UserService, getUserService]
 })
 export class SharedModule { }
